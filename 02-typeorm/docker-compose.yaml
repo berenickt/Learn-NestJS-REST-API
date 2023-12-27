@@ -1,0 +1,18 @@
+# 서비스정의
+services:
+  postgres:
+    image: postgres:15
+    # 실행시마다 재시작
+    restart: always
+    # 도커컴포즈 파일에 존재하는 위치에 실제 데이터를 hostOS에 저장
+    volumes:
+      # 현재 도커컴포즈 파일이 존재하는 경로 : 이미지안에존재하는 경로 매핑
+      - ./postgres-data:/var/lib/postgresql/data
+    ports:
+      # hostport:이미지의포트
+      # 5432포트 요청 -> 이미지의 포트로 요쳥
+      - '5808:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: typeormstudy
