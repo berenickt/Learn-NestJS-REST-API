@@ -3,12 +3,14 @@ import {
   CreateDateColumn,
   Entity,
   Generated,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   VersionColumn,
 } from 'typeorm'
 import { ProfileModel } from './profile.entity'
+import { PostModel } from './post.entity'
 
 export enum Role {
   USER = 'user',
@@ -99,6 +101,26 @@ export class UserModel {
   additionalId: string
 
   // ProfileModel에 profile의 user 컬럼과 1:1 연결
-  @OneToOne(() => ProfileModel, profile => profile.user)
+  @OneToOne(() => ProfileModel, profile => profile.user, {
+    // find() 실행할 때마다 항상 같이 가져올 relation 설정(기본값 false)
+    eager: false,
+    // 저장할 떄, relation을 한 번에 같이 저장(기본값 false)
+    cascade: true,
+    // null이 가능한지 여부(기본값 true)
+    nullable: true,
+    // 관계를 삭제했을 떄, 어떻게 삭제할 것인지
+    // - NO ACTION : 아무것도 안함
+    // - CASCADE : 참조하는 row도 같이 삭제
+    // - SET NULL : 참조하는 row에서 참조 id를 null로 변경
+    // - set default : 기본 세팅으로 설정(테이블의 기본 세팅)
+    // - RESTRICT : 참조하고 있는 row가 있는 경우 참조당하는 row 삭제 불가
+    onDelete: 'NO ACTION',
+  })
   profile: ProfileModel
+
+  @OneToMany(() => PostModel, post => post.author)
+  posts: PostModel[]
+
+  @Column({ default: 0 })
+  count: number
 }
