@@ -6,10 +6,11 @@ import { AppService } from './app.service'
 import { UserModel } from './entity/user.entity'
 import { StudentModel, TeacherModel } from './entity/person.entity'
 import { AirplaneModel, BookModel, CarModel, ComputerModel, SingleBaseModel } from './entity/inheritance.entity'
+import { ProfileModel } from './entity/profile.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserModel]),
+    TypeOrmModule.forFeature([UserModel, ProfileModel]),
     TypeOrmModule.forRoot({
       // 데이터베이스 타입
       type: 'postgres',
@@ -28,6 +29,7 @@ import { AirplaneModel, BookModel, CarModel, ComputerModel, SingleBaseModel } fr
         SingleBaseModel,
         ComputerModel,
         AirplaneModel,
+        ProfileModel,
       ],
       synchronize: true,
     }),
