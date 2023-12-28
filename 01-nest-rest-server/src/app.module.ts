@@ -5,6 +5,8 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { PostsModule } from './posts/posts.module'
 import { PostsModel } from './posts/entities/posts.entity'
+import { UsersModule } from './users/users.module'
+import { UsersModel } from './users/entities/users.entity'
 
 @Module({
   imports: [
@@ -18,9 +20,10 @@ import { PostsModel } from './posts/entities/posts.entity'
       password: 'postgres',
       database: 'postgres',
       // entities폴더에 작성한 PostsModel 가져오기
-      entities: [PostsModel],
+      entities: [PostsModel, UsersModel],
       synchronize: true,
     }),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
