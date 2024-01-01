@@ -1,12 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, OneToMany } from 'typeorm'
 import { RolesEnum } from '../const/roles.const'
 import { PostsModel } from 'src/posts/entities/posts.entity'
+import { BaseModel } from 'src/common/entities/base.entity'
 
 @Entity()
-export class UsersModel {
-  @PrimaryGeneratedColumn()
-  id: number
-
+export class UsersModel extends BaseModel {
   /*** 닉네임 특성
    * 1) 길이가 20을 넘지 않을 것
    * 2) 유일무이한 값이 될 것

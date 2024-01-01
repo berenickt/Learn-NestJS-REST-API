@@ -1,11 +1,9 @@
+import { BaseModel } from 'src/common/entities/base.entity'
 import { UsersModel } from 'src/users/entities/users.entity'
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, ManyToOne } from 'typeorm'
 
 @Entity()
-export class PostsModel {
-  @PrimaryGeneratedColumn()
-  id: number
-
+export class PostsModel extends BaseModel {
   /*** 작성자 1명이 여러 개의 포스트를 작성
    * 1) UserModel과 연동한다 (Foreign Key를 사용해서)
    * 2) null이 될 수 없다
