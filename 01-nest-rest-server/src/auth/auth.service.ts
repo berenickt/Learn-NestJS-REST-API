@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { UsersModel } from 'src/users/entities/users.entity'
-import { JWT_SECRET } from './const/auth.const'
+import { HASH_ROUNDS, JWT_SECRET } from './const/auth.const'
 import { UsersService } from 'src/users/users.service'
 import * as bcrypt from 'bcrypt'
 
@@ -79,5 +79,21 @@ export class AuthService {
     if (!passOk) throw new UnauthorizedException('비밀번호가 틀렸습니다.')
 
     return existingUser
+  }
+
+  async loginWithEmail(user: Pick<UsersModel, 'email' | 'password'>) {
+    const existingUser = await this.authenticateWithEmailAndPassword(user)
+    return this.loginUser(existingUser)
+  }
+
+  /*** hash 파라미터 (salt값은 자동 생성됨)
+   * 1) hash로 만들고 싶은 비밀번호
+   * 2) round 돌릴 횟수, 너무 많으면 시간이 기하급수적으로 올라감
+   * @see https://www.npmjs.com/package/bcrypt#a-note-on-rounds
+   */
+  async registerWithEmail(user: Pick<UsersModel, 'nickname' | 'email' | 'password'>) {
+    const hash = await bcrypt.hash(user.password, HASH_ROUNDS)
+    const newUser = await this.usersService.createUser(user)
+    return this.loginUser(newUser)
   }
 }
