@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common'
 import { PostsService } from './posts.service'
 
 @Controller('posts')
@@ -19,8 +19,8 @@ export class PostsController {
    */
   // @Param('id') 뜻 : 가져오는 파라미터의 이름은 id이다
   @Get(':id')
-  getPost(@Param('id') id: string) {
-    return this.postsService.getPostById(+id)
+  getPost(@Param('id', ParseIntPipe) id: number) {
+    return this.postsService.getPostById(id)
   }
 
   /*** 3) POST /posts
@@ -40,18 +40,18 @@ export class PostsController {
    */
   @Patch(':id')
   putPost(
-    @Param('id') id: string, //
+    @Param('id', ParseIntPipe) id: number, //
     @Body('title') title?: string,
     @Body('content') content?: string,
   ) {
-    return this.postsService.updatePost(+id, title, content)
+    return this.postsService.updatePost(id, title, content)
   }
 
   /*** 5) DELETE /posts/:id
    * id에 해당하는 post를 삭제한다
    */
   @Delete(':id')
-  deletePost(@Param('id') id: string) {
-    return this.postsService.deletePost(+id)
+  deletePost(@Param('id', ParseIntPipe) id: number) {
+    return this.postsService.deletePost(id)
   }
 }
