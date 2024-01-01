@@ -8,6 +8,7 @@ import { UsersModel } from './entities/users.entity'
 @Module({
   // 이 모듈 안에서 UsersModel을 어디서든 사용 가능
   imports: [TypeOrmModule.forFeature([UsersModel])],
+  exports: [UsersService],
   controllers: [UsersController],
   providers: [UsersService],
 })
