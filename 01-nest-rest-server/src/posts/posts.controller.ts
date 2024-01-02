@@ -47,11 +47,9 @@ export class PostsController {
    * id에 해당하는 post를 부분 변경한다
    */
   @Patch(':id')
-  putPost(
+  patchPost(
     @Param('id', ParseIntPipe) id: number, //
     @Body() body: UpdatePostDto,
-    // @Body('title') title?: string,
-    // @Body('content') content?: string,
   ) {
     return this.postsService.updatePost(id, body)
   }

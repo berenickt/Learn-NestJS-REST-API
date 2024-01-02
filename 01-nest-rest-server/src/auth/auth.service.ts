@@ -4,6 +4,7 @@ import { UsersModel } from 'src/users/entities/users.entity'
 import { HASH_ROUNDS, JWT_SECRET } from './const/auth.const'
 import { UsersService } from 'src/users/users.service'
 import * as bcrypt from 'bcrypt'
+import { RegisterUserDto } from './dto/register-user.dto'
 
 /** 만들려는 기능
  * 1) registerWithEmail
@@ -178,7 +179,7 @@ export class AuthService {
    * 2) round 돌릴 횟수, 너무 많으면 시간이 기하급수적으로 올라감
    * @see https://www.npmjs.com/package/bcrypt#a-note-on-rounds
    */
-  async registerWithEmail(user: Pick<UsersModel, 'nickname' | 'email' | 'password'>) {
+  async registerWithEmail(user: RegisterUserDto) {
     const hash = await bcrypt.hash(user.password, HASH_ROUNDS)
     const newUser = await this.usersService.createUser({
       ...user, //
