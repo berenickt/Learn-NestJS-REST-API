@@ -1,3 +1,4 @@
+import { IsString } from 'class-validator'
 import { BaseModel } from 'src/common/entities/base.entity'
 import { UsersModel } from 'src/users/entities/users.entity'
 import { Column, Entity, ManyToOne } from 'typeorm'
@@ -17,9 +18,15 @@ export class PostsModel extends BaseModel {
   author: UsersModel
 
   @Column()
+  @IsString({
+    message: 'title은 string 타입을 입력해줘야 합니다.',
+  })
   title: string
 
   @Column()
+  @IsString({
+    message: 'content은 string 타입을 입력해줘야 합니다.',
+  })
   content: string
 
   @Column()
