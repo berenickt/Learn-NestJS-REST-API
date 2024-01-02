@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common'
 import { PostsService } from './posts.service'
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard'
 import { User } from 'src/users/decorator/user.decorator'
 import { CreatePostDto } from './dto/create-post.dto'
 import { UpdatePostDto } from './dto/update-post.dto'
+import { PaginatePostDto } from './dto/paginate-post.dto'
 
 @Controller('posts')
 export class PostsController {
@@ -13,8 +14,10 @@ export class PostsController {
    * 모든 post를 다 가져온다
    */
   @Get()
-  getPosts() {
-    return this.postsService.getAllPosts()
+  getPosts(
+    @Query() query: PaginatePostDto, //
+  ) {
+    return this.postsService.paginatePosts(query)
   }
 
   /*** 2) GET /posts/:id
