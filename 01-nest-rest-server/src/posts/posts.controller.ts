@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Request, UseGuards } from '@nestjs/common'
 import { PostsService } from './posts.service'
+import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard'
 
 @Controller('posts')
 export class PostsController {
@@ -27,13 +28,15 @@ export class PostsController {
    * post를 생성한다
    */
   @Post()
+  @UseGuards(AccessTokenGuard)
   postPosts(
-    @Body('authorId') authorId: number, //
-    @Body('title') title: string,
+    @Request() req: any,
+    @Body('title') title: string, //
     @Body('content') content: string,
     // 기본값을 true로 설정하는 파이프
     // @Body('isPublic', new DefaultValuePipe(true)) isPublic: boolean,
   ) {
+    const authorId = req.user.id
     return this.postsService.createPost(authorId, title, content)
   }
 
