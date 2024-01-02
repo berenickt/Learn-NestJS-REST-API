@@ -1,4 +1,4 @@
-import { ClassSerializerInterceptor, Controller, Get, UseInterceptors } from '@nestjs/common'
+import { Controller, Get } from '@nestjs/common'
 import { UsersService } from './users.service'
 
 @Controller('users')
@@ -13,7 +13,6 @@ export class UsersController {
    *
    * Deserialization(역직렬화) : 직렬화의 반대
    */
-  @UseInterceptors(ClassSerializerInterceptor)
   getUsers() {
     return this.usersService.getAllUsers()
   }
