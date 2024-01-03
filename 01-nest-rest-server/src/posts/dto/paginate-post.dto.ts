@@ -3,6 +3,10 @@ import { IsIn, IsNumber, IsOptional } from 'class-validator'
 export class PaginatePostDto {
   @IsNumber()
   @IsOptional()
+  page?: number
+
+  @IsNumber()
+  @IsOptional()
   where__id_less_than?: number
 
   /*** 이전 마지막 데이터의 ID
