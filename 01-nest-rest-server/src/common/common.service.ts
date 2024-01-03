@@ -34,7 +34,9 @@ export class CommonService {
     repository: Repository<T>,
     overrideFindOptions: FindManyOptions<T> = {},
     path: string,
-  ) {}
+  ) {
+    const findOptions = this.composeFindOptions<T>(dto)
+  }
 
   /** 반환하는 옵션
    * where,
@@ -76,7 +78,7 @@ export class CommonService {
       if (key.startsWith('where__')) {
         where = { ...where, ...this.parseWhereFilter(key, value) }
       } else if (key.startsWith('order__')) {
-        order = { ...order, ...this.parseOrderFilter(key, value) }
+        order = { ...order, ...this.parseWhereFilter(key, value) }
       }
     }
     return {
@@ -94,7 +96,7 @@ export class CommonService {
   private parseWhereFilter<T extends BaseModel>(
     key: string, //
     value: any,
-  ): FindOptionsWhere<T> {
+  ): FindOptionsWhere<T> | FindOptionsOrder<T> {
     const options: FindOptionsWhere<T> = {}
     const split = key.split('__')
 
@@ -150,9 +152,4 @@ export class CommonService {
 
     return options
   }
-
-  private parseOrderFilter<T extends BaseModel>(
-    key: string, //
-    value: any,
-  ): FindOptionsWhere<T> {}
 }
