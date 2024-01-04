@@ -13,7 +13,7 @@ export class BaseModel {
   id: number
 
   @CreateDateColumn()
-  createAt: Date
+  createdAt: Date
 
   @UpdateDateColumn()
   updateat: Date
@@ -43,10 +43,10 @@ export class SingleBaseModel {
   id: number
 
   @CreateDateColumn()
-  createAt: Date
+  createdAt: Date
 
   @UpdateDateColumn()
-  updateat: Date
+  updatedAt: Date
 }
 
 @ChildEntity()

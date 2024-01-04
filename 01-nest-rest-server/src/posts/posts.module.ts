@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { JwtModule } from '@nestjs/jwt'
 import { PostsService } from './posts.service'
 import { PostsController } from './posts.controller'
-import { TypeOrmModule } from '@nestjs/typeorm'
 import { PostsModel } from './entities/posts.entity'
-import { JwtModule } from '@nestjs/jwt'
-import { UsersModel } from 'src/users/entities/users.entity'
-import { AuthService } from 'src/auth/auth.service'
-import { UsersService } from 'src/users/users.service'
+import { AuthModule } from 'src/auth/auth.module'
+import { UsersModule } from 'src/users/users.module'
+import { CommonModule } from 'src/common/common.module'
 
 @Module({
   imports: [
@@ -14,7 +14,10 @@ import { UsersService } from 'src/users/users.service'
     /*** 모델에 해당하는 repostory를 주입 ==> forFeature
      * repository : 해당 모델을 다룰 수 있게 해주는 클래스
      */
-    TypeOrmModule.forFeature([PostsModel, UsersModel]),
+    TypeOrmModule.forFeature([PostsModel]),
+    AuthModule,
+    UsersModule,
+    CommonModule,
   ],
   /** 컨트롤러로 사용할 파일을 정의
    * 컨트롤러로 사용할 파일을 정의,
@@ -36,6 +39,6 @@ import { UsersService } from 'src/users/users.service'
    * porviders 안에 등록된 모든 클래스들은 인스턴스화 없이
    * IoC 컨테이너가 의존하면서 사용할 수 있게 된다.
    */
-  providers: [PostsService, AuthService, UsersService],
+  providers: [PostsService],
 })
 export class PostsModule {}

@@ -47,7 +47,7 @@ export class CommonService {
    * DTO의 현재 싱긴 구조는 아래와 같다.
    * {
    * 	where__id__more_than:1,
-   * 	order__createAt: 'ASC'
+   * 	order__createdAt: 'ASC'
    * }
    *
    * 현재는 where__id__more_than 등에 해당하는 where 필터만 사용 중이지만,

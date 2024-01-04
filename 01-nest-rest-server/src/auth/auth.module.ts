@@ -9,6 +9,7 @@ import { UsersModule } from 'src/users/users.module'
     JwtModule.register({}), //
     UsersModule,
   ],
+  exports: [AuthService],
   controllers: [AuthController],
   providers: [AuthService],
 })

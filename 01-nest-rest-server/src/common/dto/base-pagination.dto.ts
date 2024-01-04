@@ -17,11 +17,11 @@ export class BasePaginationDto {
   where__id__more_than?: number
 
   /*** 정렬
-   * createAt : 생성된 시간의 내림차/오름차 순으로 정렬
+   * createdAt : 생성된 시간의 내림차/오름차 순으로 정렬
    */
   @IsIn(['ASC', 'DESC']) // 리스트에 있는 값들만 허용
   @IsOptional()
-  order__createAt: 'ASC' | 'DESC' = 'ASC'
+  order__createdAt: 'DESC' | 'ASC' = 'DESC'
 
   /*** 갖고올 데이터 개수
    * 몇 개의 데이터를 응답으로 받을지

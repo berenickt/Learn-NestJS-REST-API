@@ -59,7 +59,7 @@ export class PostsService {
       skip: dto.take * (dto.page - 1), // 1페이지부터 시작하도록
       take: dto.take,
       order: {
-        createAt: dto.order__createAt,
+        createdAt: dto.order__createdAt,
       },
     })
 
@@ -84,7 +84,7 @@ export class PostsService {
     const posts = await this.postsRepository.find({
       where,
       order: {
-        createAt: dto.order__createAt,
+        createdAt: dto.order__createdAt,
       },
       take: dto.take,
     })
@@ -109,7 +109,7 @@ export class PostsService {
         }
       }
       let key = null
-      if (dto.order__createAt === 'ASC') {
+      if (dto.order__createdAt === 'ASC') {
         key = 'where__id__more_than'
       } else {
         key = 'where__id__less_than'
