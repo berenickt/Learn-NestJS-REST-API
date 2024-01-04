@@ -10,10 +10,15 @@ import { UsersModule } from './users/users.module'
 import { UsersModel } from './users/entities/users.entity'
 import { AuthModule } from './auth/auth.module'
 import { CommonModule } from './common/common.module'
+import { ConfigModule } from '@nestjs/config'
 
 @Module({
   imports: [
     PostsModule,
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       // 데이터베이스 타입
       type: 'postgres',

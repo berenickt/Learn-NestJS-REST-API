@@ -1,12 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+
 import { FindManyOptions, FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm'
 import { BasePaginationDto } from './dto/base-pagination.dto'
 import { BaseModel } from './entities/base.entity'
 import { FILTER_MAPPER } from './const/filter-mapper.const'
-import { HOST, PROTOCOL } from './const/env.const'
+import { ENV_HOST_KEY, ENV_PROTOCOL_KEY } from './const/env-keys.const'
 
 @Injectable()
 export class CommonService {
+  constructor(private readonly configService: ConfigService) {}
+
   paginate<T extends BaseModel>(
     dto: BasePaginationDto,
     repository: Repository<T>,
@@ -59,6 +63,8 @@ export class CommonService {
      * 아니면 null을 반환한다.
      */
     const lastItem = data.length > 0 && data.length === dto.take ? data[data.length - 1] : null
+    const PROTOCOL = this.configService.get<string>(ENV_PROTOCOL_KEY)
+    const HOST = this.configService.get<string>(ENV_HOST_KEY)
     const nextUrl = lastItem && new URL(`${PROTOCOL}://${HOST}/${path}`)
 
     /**** dto의 키값들을 루핑하면서

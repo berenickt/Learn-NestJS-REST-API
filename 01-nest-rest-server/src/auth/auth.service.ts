@@ -1,10 +1,12 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
+
 import { UsersModel } from 'src/users/entities/users.entity'
-import { HASH_ROUNDS, JWT_SECRET } from './const/auth.const'
 import { UsersService } from 'src/users/users.service'
 import * as bcrypt from 'bcrypt'
 import { RegisterUserDto } from './dto/register-user.dto'
+import { ENV_HASH_ROUNDS_KEY, ENV_JWT_SECRET_KEY } from 'src/common/const/env-keys.const'
 
 /** 만들려는 기능
  * 1) registerWithEmail
@@ -34,6 +36,7 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
+    private readonly configService: ConfigService,
   ) {}
 
   /*** 토큰을 사용하게 되는 방식
@@ -99,7 +102,7 @@ export class AuthService {
   verifyToken(token: string) {
     try {
       return this.jwtService.verify(token, {
-        secret: JWT_SECRET,
+        secret: this.configService.get<string>(ENV_JWT_SECRET_KEY),
       })
     } catch (err) {
       throw new UnauthorizedException('토큰이 만료됏거나 잘못된 토큰입니다.')
@@ -108,7 +111,7 @@ export class AuthService {
 
   rotateToken(token: string, isRefreshToken: boolean) {
     const decoded = this.jwtService.verify(token, {
-      secret: JWT_SECRET,
+      secret: this.configService.get<string>(ENV_JWT_SECRET_KEY),
     })
 
     /***
@@ -136,7 +139,7 @@ export class AuthService {
     }
 
     return this.jwtService.sign(payload, {
-      secret: JWT_SECRET,
+      secret: this.configService.get<string>(ENV_JWT_SECRET_KEY),
       expiresIn: isRefreshToken ? 3600 : 300, // 3600초(1시간) 초단위로 설정
     })
   }
@@ -180,7 +183,10 @@ export class AuthService {
    * @see https://www.npmjs.com/package/bcrypt#a-note-on-rounds
    */
   async registerWithEmail(user: RegisterUserDto) {
-    const hash = await bcrypt.hash(user.password, HASH_ROUNDS)
+    const hash = await bcrypt.hash(
+      user.password, //
+      parseInt(this.configService.get<string>(ENV_HASH_ROUNDS_KEY)),
+    )
     const newUser = await this.usersService.createUser({
       ...user, //
       password: hash,
