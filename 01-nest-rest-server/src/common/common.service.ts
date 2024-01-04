@@ -38,7 +38,7 @@ export class CommonService {
   ) {
     const findOptions = this.composeFindOptions<T>(dto)
 
-    const results = await repository.find({
+    const data = await repository.find({
       ...findOptions,
       ...overrideFindOptions,
     })
@@ -47,8 +47,8 @@ export class CommonService {
      * 해당되는 포스트가 0개 이상이면, 마지막 포스트를 가져오고
      * 아니면 null을 반환한다.
      */
-    const lastItem = results.length > 0 && results.length === dto.take ? results[results.length - 1] : null
-    const nextUrl = lastItem && new URL(`${PROTOCOL}://${HOST}/posts`)
+    const lastItem = data.length > 0 && data.length === dto.take ? data[data.length - 1] : null
+    const nextUrl = lastItem && new URL(`${PROTOCOL}://${HOST}/${path}`)
 
     /**** dto의 키값들을 루핑하면서
      * 키값에 해당되는 벨류가 존재하면, parame에 그대로 붙여넣는다.
@@ -56,13 +56,12 @@ export class CommonService {
      */
     if (nextUrl) {
       for (const key of Object.keys(dto)) {
-        if (dto[key]) {
-          if (key !== 'where__id__more_than' && key !== 'where__id__less_than') {
-            nextUrl.searchParams.append(key, dto[key])
-          }
+        if (key !== 'where__id__more_than' && key !== 'where__id__less_than') {
+          nextUrl.searchParams.append(key, dto[key])
         }
       }
-      let key = null
+
+      let key: string
       if (dto.order__createdAt === 'ASC') {
         key = 'where__id__more_than'
       } else {
@@ -72,11 +71,11 @@ export class CommonService {
     }
 
     return {
-      data: results,
+      data,
       cursor: {
         after: lastItem?.id ?? null,
       },
-      count: results.length,
+      count: data.length,
       next: nextUrl?.toString() ?? null,
     }
   }

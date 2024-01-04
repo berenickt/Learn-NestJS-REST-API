@@ -21,7 +21,7 @@ export class BasePaginationDto {
    */
   @IsIn(['ASC', 'DESC']) // 리스트에 있는 값들만 허용
   @IsOptional()
-  order__createdAt: 'DESC' | 'ASC' = 'DESC'
+  order__createdAt: 'ASC' | 'DESC' = 'ASC'
 
   /*** 갖고올 데이터 개수
    * 몇 개의 데이터를 응답으로 받을지

@@ -8,15 +8,6 @@ import { PaginatePostDto } from './dto/paginate-post.dto'
 import { HOST, PROTOCOL } from 'src/common/const/env.const'
 import { CommonService } from 'src/common/common.service'
 
-export interface PostModel {
-  id: number
-  author: string
-  title: string
-  content: string
-  likeCount: number
-  commentCount: number
-}
-
 @Injectable()
 export class PostsService {
   constructor(
