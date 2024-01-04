@@ -12,6 +12,8 @@ async function bootstrap() {
         // 임의로 변환을 허가
         enableImplicitConversion: true,
       },
+      whitelist: true,
+      forbidNonWhitelisted: true,
     }),
   )
 
