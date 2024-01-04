@@ -6,6 +6,7 @@ import { CreatePostDto } from './dto/create-post.dto'
 import { UpdatePostDto } from './dto/update-post.dto'
 import { PaginatePostDto } from './dto/paginate-post.dto'
 import { HOST, PROTOCOL } from 'src/common/const/env.const'
+import { CommonService } from 'src/common/common.service'
 
 export interface PostModel {
   id: number
@@ -21,6 +22,7 @@ export class PostsService {
   constructor(
     @InjectRepository(PostsModel)
     private readonly postsRepository: Repository<PostsModel>,
+    private readonly commonService: CommonService,
   ) {}
 
   async getAllPosts() {
@@ -43,11 +45,17 @@ export class PostsService {
    * 1) 오름차순으로 정렬하는 pagination만 구현한다
    */
   async paginatePosts(dto: PaginatePostDto) {
-    if (dto.page) {
-      return this.pagePaginatePosts(dto)
-    } else {
-      return this.cursorPaginatePosts(dto)
-    }
+    return this.commonService.paginate(
+      dto, //
+      this.postsRepository,
+      {},
+      'posts',
+    )
+    // if (dto.page) {
+    //   return this.pagePaginatePosts(dto)
+    // } else {
+    //   return this.cursorPaginatePosts(dto)
+    // }
   }
 
   /*** 페이지 기반 페이지네이션
@@ -103,16 +111,16 @@ export class PostsService {
     if (nextUrl) {
       for (const key of Object.keys(dto)) {
         if (dto[key]) {
-          if (key !== 'where__id_more_than' && key !== 'where__id_less_than') {
+          if (key !== 'where__id__more_than' && key !== 'where__id__less_than') {
             nextUrl.searchParams.append(key, dto[key])
           }
         }
       }
       let key = null
       if (dto.order__createdAt === 'ASC') {
-        key = 'where__id_more_than'
+        key = 'where__id__more_than'
       } else {
-        key = 'where__id_less_than'
+        key = 'where__id__less_than'
       }
       nextUrl.searchParams.append(key, lastItem.id.toString())
     }

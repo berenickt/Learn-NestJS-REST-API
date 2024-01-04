@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { JwtModule } from '@nestjs/jwt'
 import { PostsService } from './posts.service'
 import { PostsController } from './posts.controller'
 import { PostsModel } from './entities/posts.entity'
@@ -10,11 +9,12 @@ import { CommonModule } from 'src/common/common.module'
 
 @Module({
   imports: [
-    JwtModule.register({}),
     /*** 모델에 해당하는 repostory를 주입 ==> forFeature
      * repository : 해당 모델을 다룰 수 있게 해주는 클래스
      */
-    TypeOrmModule.forFeature([PostsModel]),
+    TypeOrmModule.forFeature([
+      PostsModel, //
+    ]),
     AuthModule,
     UsersModule,
     CommonModule,

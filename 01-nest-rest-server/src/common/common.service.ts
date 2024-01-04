@@ -3,6 +3,7 @@ import { FindManyOptions, FindOptionsOrder, FindOptionsWhere, Repository } from 
 import { BasePaginationDto } from './dto/base-pagination.dto'
 import { BaseModel } from './entities/base.entity'
 import { FILTER_MAPPER } from './const/filter-mapper.const'
+import { HOST, PROTOCOL } from './const/env.const'
 
 @Injectable()
 export class CommonService {
@@ -36,6 +37,48 @@ export class CommonService {
     path: string,
   ) {
     const findOptions = this.composeFindOptions<T>(dto)
+
+    const results = await repository.find({
+      ...findOptions,
+      ...overrideFindOptions,
+    })
+
+    /****
+     * 해당되는 포스트가 0개 이상이면, 마지막 포스트를 가져오고
+     * 아니면 null을 반환한다.
+     */
+    const lastItem = results.length > 0 && results.length === dto.take ? results[results.length - 1] : null
+    const nextUrl = lastItem && new URL(`${PROTOCOL}://${HOST}/posts`)
+
+    /**** dto의 키값들을 루핑하면서
+     * 키값에 해당되는 벨류가 존재하면, parame에 그대로 붙여넣는다.
+     * 단, where__id__more_than 값만  lastItem의 마지막 값으로 넣어준다.
+     */
+    if (nextUrl) {
+      for (const key of Object.keys(dto)) {
+        if (dto[key]) {
+          if (key !== 'where__id__more_than' && key !== 'where__id__less_than') {
+            nextUrl.searchParams.append(key, dto[key])
+          }
+        }
+      }
+      let key = null
+      if (dto.order__createdAt === 'ASC') {
+        key = 'where__id__more_than'
+      } else {
+        key = 'where__id__less_than'
+      }
+      nextUrl.searchParams.append(key, lastItem.id.toString())
+    }
+
+    return {
+      data: results,
+      cursor: {
+        after: lastItem?.id ?? null,
+      },
+      count: results.length,
+      next: nextUrl?.toString() ?? null,
+    }
   }
 
   /** 반환하는 옵션
