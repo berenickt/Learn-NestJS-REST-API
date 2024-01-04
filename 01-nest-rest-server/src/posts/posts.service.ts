@@ -42,11 +42,6 @@ export class PostsService {
       {},
       'posts',
     )
-    // if (dto.page) {
-    //   return this.pagePaginatePosts(dto)
-    // } else {
-    //   return this.cursorPaginatePosts(dto)
-    // }
   }
 
   /*** 페이지 기반 페이지네이션

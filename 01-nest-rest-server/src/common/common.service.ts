@@ -24,7 +24,18 @@ export class CommonService {
     dto: BasePaginationDto,
     repository: Repository<T>,
     overrideFindOptions: FindManyOptions<T> = {},
-  ) {}
+  ) {
+    const findOptions = this.composeFindOptions<T>(dto)
+    const [data, total] = await repository.findAndCount({
+      ...findOptions,
+      ...overrideFindOptions,
+    })
+
+    return {
+      total,
+      data,
+    }
+  }
 
   /***
    * where__likeCount__more_than
