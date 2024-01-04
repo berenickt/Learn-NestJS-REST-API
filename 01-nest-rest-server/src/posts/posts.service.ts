@@ -39,7 +39,7 @@ export class PostsService {
     return this.commonService.paginate(
       dto, //
       this.postsRepository,
-      {},
+      { relations: ['author'] },
       'posts',
     )
   }
