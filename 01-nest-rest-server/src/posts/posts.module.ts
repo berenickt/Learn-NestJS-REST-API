@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { BadRequestException, Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { PostsService } from './posts.service'
 import { PostsController } from './posts.controller'
@@ -6,6 +6,11 @@ import { PostsModel } from './entities/posts.entity'
 import { AuthModule } from 'src/auth/auth.module'
 import { UsersModule } from 'src/users/users.module'
 import { CommonModule } from 'src/common/common.module'
+import { MulterModule } from '@nestjs/platform-express'
+import { extname } from 'path'
+import multer from 'multer'
+import { POST_IMAGE_PATH } from 'src/common/const/path.const'
+import { v4 as uuid } from 'uuid'
 
 @Module({
   imports: [
@@ -18,6 +23,37 @@ import { CommonModule } from 'src/common/common.module'
     AuthModule,
     UsersModule,
     CommonModule,
+    MulterModule.register({
+      limits: {
+        // byte 단위로 입력 (10000000byte -> 10MB가 넘는 파일은 에러)
+        fieldSize: 10000000,
+      },
+      /*** cb(에러, boolean)
+       * 첫번쨰 파라미터에는 에러가 있을 경우 에러 정보를 넣어준다.
+       * 두번쨰 파라미터는 파일을 받을지 말지 boolean을 넣어준다.
+       */
+      fileFilter: (req, file, cb) => {
+        // xxx.jpg -> .jpg같이 확장자만 가져와줌
+        const ext = extname(file.originalname)
+
+        if (ext !== '.jpg' && ext !== '.jpeg' && ext !== '.png') {
+          return cb(
+            new BadRequestException('jpg/jpeg/png 파일만 업로드 가능합니다!'), //
+            false,
+          )
+        }
+        return cb(null, true)
+      },
+      storage: multer.diskStorage({
+        // 파일을 어디에 보낼지
+        destination: function (req, res, cb) {
+          cb(null, POST_IMAGE_PATH)
+        },
+        filename: function (req, file, cb) {
+          cb(null, `${uuid()}${extname(file.originalname)}`)
+        },
+      }),
+    }),
   ],
   /** 컨트롤러로 사용할 파일을 정의
    * 컨트롤러로 사용할 파일을 정의,
