@@ -57,7 +57,7 @@ export class PostsController {
    */
   @Post()
   @UseGuards(AccessTokenGuard)
-  postPosts(
+  async postPosts(
     @User('id') userId: number,
     @Body() body: CreatePostDto,
     // @Body('title') title: string,
@@ -65,6 +65,7 @@ export class PostsController {
     // 기본값을 true로 설정하는 파이프
     // @Body('isPublic', new DefaultValuePipe(true)) isPublic: boolean,
   ) {
+    await this.postsService.createPostImage(body)
     return this.postsService.createPost(userId, body)
   }
 
