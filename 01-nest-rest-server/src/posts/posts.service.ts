@@ -11,18 +11,23 @@ import { ENV_HOST_KEY, ENV_PROTOCOL_KEY } from 'src/common/const/env-keys.const'
 import { POST_IMAGE_PATH, TEMP_FOLDER_PATH } from 'src/common/const/path.const'
 import { basename, join } from 'path'
 import { promises } from 'fs'
+import { CreatePostImageDto } from './image/dto/create-image.dto'
+import { ImageModel } from 'src/common/entities/image.entity'
+import { DEFAULT_POST_FIND_OPTIONS } from './const/default-post-find-options.const'
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(PostsModel)
     private readonly postsRepository: Repository<PostsModel>,
+    @InjectRepository(ImageModel)
+    private readonly imageRepository: Repository<ImageModel>,
     private readonly commonService: CommonService,
     private readonly configService: ConfigService,
   ) {}
 
   async getAllPosts() {
-    return this.postsRepository.find({ relations: ['author'] })
+    return this.postsRepository.find({ ...DEFAULT_POST_FIND_OPTIONS })
   }
 
   /*** 페이지네이션용 테스트 포스트 생성
@@ -33,6 +38,7 @@ export class PostsService {
       await this.createPost(userId, {
         title: `임의로 생성된 포스트 제목 ${i}`,
         content: `임의로 생성된 포스트 내용 ${i}`,
+        images: [],
       })
     }
   }
@@ -44,7 +50,7 @@ export class PostsService {
     return this.commonService.paginate(
       dto, //
       this.postsRepository,
-      { relations: ['author'] },
+      { ...DEFAULT_POST_FIND_OPTIONS },
       'posts',
     )
   }
@@ -138,11 +144,11 @@ export class PostsService {
 
   async getPostById(id: number) {
     const post = await this.postsRepository.findOne({
+      ...DEFAULT_POST_FIND_OPTIONS,
       // PostsModel의 id가 입력받은 id와 같은지 필터링
       where: {
         id,
       },
-      relations: ['author'],
     })
     if (!post) {
       throw new NotFoundException()
@@ -160,6 +166,7 @@ export class PostsService {
         id: authorId,
       },
       ...postDto,
+      images: [],
       likeCount: 0,
       commentCount: 0,
     })
@@ -167,9 +174,9 @@ export class PostsService {
     return newPost
   }
 
-  async createPostImage(dto: CreatePostDto) {
-    // dto의 이미지 이름을 기바으로 파일 경로를 생성한다
-    const tempFilePath = join(TEMP_FOLDER_PATH, dto.image)
+  async createPostImage(dto: CreatePostImageDto) {
+    // dto의 이미지 이름을 기반으로 파일 경로를 생성한다
+    const tempFilePath = join(TEMP_FOLDER_PATH, dto.path)
 
     try {
       /*** promises의 fs 모듈을 import
@@ -191,10 +198,15 @@ export class PostsService {
      */
     const publicFilePath = join(POST_IMAGE_PATH, fileName)
 
+    // save
+    const result = await this.imageRepository.save({
+      ...dto,
+    })
+
     // 파일 옮기기
     await promises.rename(tempFilePath, publicFilePath)
 
-    return true
+    return result
   }
 
   /** save의 2가지 기능
