@@ -19,7 +19,6 @@ import { CreatePostDto } from './dto/create-post.dto'
 import { UpdatePostDto } from './dto/update-post.dto'
 import { PaginatePostDto } from './dto/paginate-post.dto'
 import { UsersModel } from 'src/users/entities/users.entity'
-import { FileInterceptor } from '@nestjs/platform-express'
 
 @Controller('posts')
 export class PostsController {
@@ -58,21 +57,15 @@ export class PostsController {
    */
   @Post()
   @UseGuards(AccessTokenGuard)
-  @UseInterceptors(FileInterceptor('image'))
   postPosts(
     @User('id') userId: number,
     @Body() body: CreatePostDto,
-    @UploadedFile() file?: Express.Multer.File,
     // @Body('title') title: string,
     // @Body('content') content: string,
     // 기본값을 true로 설정하는 파이프
     // @Body('isPublic', new DefaultValuePipe(true)) isPublic: boolean,
   ) {
-    return this.postsService.createPost(
-      userId, //
-      body,
-      file?.filename,
-    )
+    return this.postsService.createPost(userId, body)
   }
 
   /*** 4) PATCH /posts/:id
