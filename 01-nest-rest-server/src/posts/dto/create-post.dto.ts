@@ -12,5 +12,5 @@ export class CreatePostDto extends PickType(PostsModel, ['title', 'content']) {
     each: true, // 리스트 개별 요소마다 string으로 할지
   })
   @IsOptional()
-  images: string[]
+  images: string[] = []
 }

@@ -44,5 +44,6 @@ import { PostsImagesService } from './image/images.service'
    * IoC 컨테이너가 의존하면서 사용할 수 있게 된다.
    */
   providers: [PostsService, PostsImagesService],
+  exports: [PostsService],
 })
 export class PostsModule {}
