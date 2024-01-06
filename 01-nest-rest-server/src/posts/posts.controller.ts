@@ -38,16 +38,6 @@ export class PostsController {
     return this.postsService.paginatePosts(query)
   }
 
-  /*** POST /posts/random
-   *
-   */
-  @Post('random')
-  @UseGuards(AccessTokenGuard)
-  async postPostsRandom(@User() user: UsersModel) {
-    await this.postsService.generatePosts(user.id)
-    return true
-  }
-
   /*** 2) GET /posts/:id
    * id에 해당하는 post를 가져온다
    * e.g. 11이라는 ID를 갖고있는 Post 하나를 가져온다.
@@ -80,23 +70,21 @@ export class PostsController {
   async postPosts(
     @User('id') userId: number,
     @Body() body: CreatePostDto,
-    // @Body('title') title: string,
-    // @Body('content') content: string,
     // 기본값을 true로 설정하는 파이프
     // @Body('isPublic', new DefaultValuePipe(true)) isPublic: boolean,
   ) {
-    // (1) 트랜잭션과 관련된 모든 쿼리를 담당할 쿼리 러너(qr)를 생성한다.
+    // 3-1) 트랜잭션과 관련된 모든 쿼리를 담당할 쿼리 러너(qr)를 생성한다.
     const qr = this.dataSource.createQueryRunner()
 
-    // (2) 쿼리 러너에 연결한다.
+    // 3-2) 쿼리 러너에 연결한다.
     await qr.connect()
-    /*** 쿼리 러너에서 트랜잭션을 시작한다.
+    /** 3-3) 쿼리 러너에서 트랜잭션을 시작한다.
      * 이 시점부터 같은 쿼리 러너를 사용하면
      * 트랜잭션 안에서 데이터베이스 액션을 실행한다.
      */
     await qr.startTransaction()
 
-    // 로직실행
+    // 3-3) 로직실행
     try {
       const post = await this.postsService.createPost(userId, body, qr)
       // throw new InternalServerErrorException('일부러 에러 발생 테스트')
@@ -122,7 +110,17 @@ export class PostsController {
     }
   }
 
-  /*** 4) PATCH /posts/:id
+  /*** 4) POST /posts/random
+   * 무작위 포스트를 생성한다.
+   */
+  @Post('random')
+  @UseGuards(AccessTokenGuard)
+  async postPostsRandom(@User() user: UsersModel) {
+    await this.postsService.generatePosts(user.id)
+    return true
+  }
+
+  /*** 5) PATCH /posts/:id
    * id에 해당하는 post를 부분 변경한다
    */
   @Patch(':id')
@@ -133,7 +131,7 @@ export class PostsController {
     return this.postsService.updatePost(id, body)
   }
 
-  /*** 5) DELETE /posts/:id
+  /*** 6) DELETE /posts/:id
    * id에 해당하는 post를 삭제한다
    */
   @Delete(':id')

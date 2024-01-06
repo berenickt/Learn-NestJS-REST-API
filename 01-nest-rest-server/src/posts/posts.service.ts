@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { FindOptionsWhere, LessThan, MoreThan, QueryRunner, Repository } from 'typeorm'
 import { PostsModel } from './entities/posts.entity'
@@ -22,13 +22,12 @@ export class PostsService {
     private readonly configService: ConfigService,
   ) {}
 
+  // **** 1) 모든 포스트를 가져오기
   async getAllPosts() {
     return this.postsRepository.find({ ...DEFAULT_POST_FIND_OPTIONS })
   }
 
-  /*** 페이지네이션용 테스트 포스트 생성
-   *
-   */
+  // **** 2) 페이지네이션용 테스트 포스트 생성
   async generatePosts(userId: number) {
     for (let i = 0; i < 100; i++) {
       await this.createPost(userId, {
@@ -39,9 +38,7 @@ export class PostsService {
     }
   }
 
-  /***
-   * 1) 오름차순으로 정렬하는 pagination만 구현한다
-   */
+  // **** 3) 오름차순으로 정렬하는 pagination만 구현
   async paginatePosts(dto: PaginatePostDto) {
     return this.commonService.paginate(
       dto, //
@@ -51,10 +48,7 @@ export class PostsService {
     )
   }
 
-  /*** 페이지 기반 페이지네이션
-   * data: Data[],
-   * total: number
-   */
+  // **** 4) 페이지 기반 페이지네이션
   async pagePaginatePosts(dto: PaginatePostDto) {
     const [posts, count] = await this.postsRepository.findAndCount({
       skip: dto.take * dto.page,
@@ -70,9 +64,7 @@ export class PostsService {
     }
   }
 
-  /*** 커서 기반 페이지네이션
-   *
-   */
+  // **** 5) 커서 기반 페이지네이션
   async cursorPaginatePosts(dto: PaginatePostDto) {
     const where: FindOptionsWhere<PostsModel> = {}
 
@@ -90,10 +82,7 @@ export class PostsService {
       take: dto.take,
     })
 
-    /****
-     * 해당되는 포스트가 0개 이상이면, 마지막 포스트를 가져오고
-     * 아니면 null을 반환한다.
-     */
+    // 해당되는 포스트가 0개 이상이면, 마지막 포스트를 가져오고, 아니면 null을 반환
     const lastItem = posts.length > 0 && posts.length === dto.take ? posts[posts.length - 1] : null
     const PROTOCOL = this.configService.get<string>(ENV_PROTOCOL_KEY)
     const HOST = this.configService.get<string>(ENV_HOST_KEY)
@@ -138,6 +127,7 @@ export class PostsService {
     }
   }
 
+  // **** 6) ID별 포스트 가져오기
   async getPostById(id: number) {
     const post = await this.postsRepository.findOne({
       ...DEFAULT_POST_FIND_OPTIONS,
@@ -152,13 +142,14 @@ export class PostsService {
     return post
   }
 
+  // **** 7) QueryRunner 유무에 따른 적용
   getRepository(qr?: QueryRunner) {
     return qr
       ? qr.manager.getRepository<PostsModel>(PostsModel) //
       : this.postsRepository
   }
 
-  /**
+  /**** 8) 포스트 생성
    * 1) create : 저장할 객체를 생성
    * 2) save   : 객체를 저장 (create 메서드에서 생성한 객체로)
    */
@@ -178,7 +169,8 @@ export class PostsService {
     return newPost
   }
 
-  /** save의 2가지 기능
+  /**** 9) 포스트 업데이트
+   * save의 2가지 기능
    * 1) 만약에 데이터가 존재하지 않는다면(id 기준) 새로 생성한다.
    * 2) 만약에 데이터가 존재한다면(같은 id의 값이 존재한다면) 존재하던 값을 업데이트한다.
    */
@@ -196,6 +188,7 @@ export class PostsService {
     return newPost
   }
 
+  // **** 10) 포스트 삭제
   async deletePost(postId: number) {
     const post = await this.postsRepository.findOne({
       where: { id: postId },

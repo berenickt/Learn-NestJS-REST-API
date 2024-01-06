@@ -1,11 +1,11 @@
 import { BadRequestException, Module } from '@nestjs/common'
 import * as multer from 'multer'
 import { v4 as uuid } from 'uuid'
+import { MulterModule } from '@nestjs/platform-express'
 
 import e from 'express'
 import { CommonService } from './common.service'
 import { CommonController } from './common.controller'
-import { MulterModule } from '@nestjs/platform-express'
 import { TEMP_FOLDER_PATH } from './const/path.const'
 import { extname } from 'path'
 import { AuthModule } from 'src/auth/auth.module'

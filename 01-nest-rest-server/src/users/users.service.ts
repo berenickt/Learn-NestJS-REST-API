@@ -10,8 +10,8 @@ export class UsersService {
     private readonly userRepository: Repository<UsersModel>,
   ) {}
 
-  /***
-   * 1) nickname 중복이 없는지 확인
+  /**** 1) 회원가입
+   * - nickname 중복이 없는지 확인
    * - exist() : 만약 조건에 해당되는 값이 있으면 true 반환
    */
   async createUser(user: Pick<UsersModel, 'nickname' | 'email' | 'password'>) {
@@ -34,10 +34,12 @@ export class UsersService {
     return newUser
   }
 
+  // **** 2) 모든 사용자 가져오기
   async getAllUsers() {
     return this.userRepository.find()
   }
 
+  // **** 3) 이메일별 사용자 가져오기
   async getUserByEmail(email: string) {
     return this.userRepository.findOne({
       where: { email },

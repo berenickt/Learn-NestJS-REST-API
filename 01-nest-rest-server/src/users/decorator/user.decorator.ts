@@ -11,9 +11,7 @@ export const User = createParamDecorator((data: keyof UsersModel | undefined, co
     )
   }
 
-  if (data) {
-    return user[data]
-  }
+  if (data) return user[data]
 
   return user
 })

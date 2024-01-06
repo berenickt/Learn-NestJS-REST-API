@@ -61,7 +61,7 @@ export class AuthService {
    *    새로운 토큰을 발급받고, 새로운 토큰을 사용해서 private route에 접근한다.
    */
 
-  /** Header로부터 토큰을 받을 떄
+  /**** 1) Header로부터 토큰을 받을 떄
    * {authorization: 'Basic {token}'} - 로그인
    * {authorization: 'Bearer {token}'} - 발급받은 토큰을 그대로 넣었을 떄
    */
@@ -77,7 +77,7 @@ export class AuthService {
     return token
   }
 
-  /*** email:password 형태로 바꾸기
+  /**** 2) email:password 형태로 바꾸기
    * 1) dafklmlfa:askdmklasmda -> email:password
    * 2) email:password -> [email, password]
    * 3) {email: email, password: password}
@@ -96,7 +96,7 @@ export class AuthService {
     }
   }
 
-  /*** 토큰 검증
+  /**** 3) 토큰 검증
    *
    */
   verifyToken(token: string) {
@@ -109,6 +109,7 @@ export class AuthService {
     }
   }
 
+  // **** 4)
   rotateToken(token: string, isRefreshToken: boolean) {
     const decoded = this.jwtService.verify(token, {
       secret: this.configService.get<string>(ENV_JWT_SECRET_KEY),
@@ -126,7 +127,7 @@ export class AuthService {
     return this.signToken({ ...decoded }, isRefreshToken)
   }
 
-  /** Payload에 들어갈 정보
+  /**** 5) Payload에 들어갈 정보
    * 1) email
    * 2) sub -> 사용자 id
    * 3) type -> 'access' | 'refresh'
@@ -144,6 +145,7 @@ export class AuthService {
     })
   }
 
+  // **** 6) 유저로 로그인
   loginUser(user: Pick<UsersModel, 'email' | 'id'>) {
     return {
       accessToken: this.signToken(user, false),
@@ -151,7 +153,7 @@ export class AuthService {
     }
   }
 
-  /***
+  /**** 7)
    * 1. 사용자가 존재하는 확인(email)
    * 2. 비밀번호가 맞는지 확인
    * 3. 모두 통과되면 사용자 정보 반환
@@ -172,12 +174,13 @@ export class AuthService {
     return existingUser
   }
 
+  // **** 8)
   async loginWithEmail(user: Pick<UsersModel, 'email' | 'password'>) {
     const existingUser = await this.authenticateWithEmailAndPassword(user)
     return this.loginUser(existingUser)
   }
 
-  /*** hash 파라미터 (salt값은 자동 생성됨)
+  /**** 9) hash 파라미터 (salt값은 자동 생성됨)
    * 1) hash로 만들고 싶은 비밀번호
    * 2) round 돌릴 횟수, 너무 많으면 시간이 기하급수적으로 올라감
    * @see https://www.npmjs.com/package/bcrypt#a-note-on-rounds

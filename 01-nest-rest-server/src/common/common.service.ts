@@ -11,6 +11,7 @@ import { ENV_HOST_KEY, ENV_PROTOCOL_KEY } from './const/env-keys.const'
 export class CommonService {
   constructor(private readonly configService: ConfigService) {}
 
+  // **** 1) 페이지네이션
   paginate<T extends BaseModel>(
     dto: BasePaginationDto,
     repository: Repository<T>,
@@ -24,6 +25,7 @@ export class CommonService {
     }
   }
 
+  // **** 2) 페이지 기반 페이지네이션
   private async pagePaginate<T extends BaseModel>(
     dto: BasePaginationDto,
     repository: Repository<T>,
@@ -41,10 +43,7 @@ export class CommonService {
     }
   }
 
-  /***
-   * where__likeCount__more_than
-   * where__title__ilike
-   */
+  // **** 3) 커서 기반 페이지네이션
   private async cursorPaginate<T extends BaseModel>(
     dto: BasePaginationDto,
     repository: Repository<T>,
@@ -97,7 +96,7 @@ export class CommonService {
     }
   }
 
-  /** 반환하는 옵션
+  /**** 4) 반환하는 옵션
    * where,
    * order,
    * take,
@@ -148,7 +147,7 @@ export class CommonService {
     }
   }
 
-  /*** 길이가 3일 경우
+  /**** 5) 길이가 3일 경우
    * e.g. where__id__more_than을 __를 기준으로 나누면,
    * ['where', 'id', 'more_than']으로 나눌 수 있다.
    */
