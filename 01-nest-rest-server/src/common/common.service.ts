@@ -32,14 +32,15 @@ export class CommonService {
     overrideFindOptions: FindManyOptions<T> = {},
   ) {
     const findOptions = this.composeFindOptions<T>(dto)
-    const [data, total] = await repository.findAndCount({
+
+    const [data, count] = await repository.findAndCount({
       ...findOptions,
       ...overrideFindOptions,
     })
 
     return {
-      total,
       data,
+      total: count,
     }
   }
 
@@ -52,19 +53,16 @@ export class CommonService {
   ) {
     const findOptions = this.composeFindOptions<T>(dto)
 
-    const data = await repository.find({
+    const results = await repository.find({
       ...findOptions,
       ...overrideFindOptions,
     })
 
-    /****
-     * 해당되는 포스트가 0개 이상이면, 마지막 포스트를 가져오고
-     * 아니면 null을 반환한다.
-     */
-    const lastItem = data.length > 0 && data.length === dto.take ? data[data.length - 1] : null
-    const PROTOCOL = this.configService.get<string>(ENV_PROTOCOL_KEY)
-    const HOST = this.configService.get<string>(ENV_HOST_KEY)
-    const nextUrl = lastItem && new URL(`${PROTOCOL}://${HOST}/${path}`)
+    // 해당되는 포스트가 0개 이상이면, 마지막 포스트를 가져오고, 아니면 null
+    const lastItem = results.length > 0 && results.length === dto.take ? results[results.length - 1] : null
+    const protocol = this.configService.get<string>(ENV_PROTOCOL_KEY)
+    const host = this.configService.get<string>(ENV_HOST_KEY)
+    const nextUrl = lastItem && new URL(`${protocol}://${host}/${path}`)
 
     /**** dto의 키값들을 루핑하면서
      * 키값에 해당되는 벨류가 존재하면, parame에 그대로 붙여넣는다.
@@ -72,26 +70,30 @@ export class CommonService {
      */
     if (nextUrl) {
       for (const key of Object.keys(dto)) {
-        if (key !== 'where__id__more_than' && key !== 'where__id__less_than') {
-          nextUrl.searchParams.append(key, dto[key])
+        if (dto[key]) {
+          if (key !== 'where__id__more_than' && key !== 'where__id__less_than') {
+            nextUrl.searchParams.append(key, dto[key])
+          }
         }
       }
 
-      let key: string
+      let key = null
+
       if (dto.order__createdAt === 'ASC') {
         key = 'where__id__more_than'
       } else {
         key = 'where__id__less_than'
       }
+
       nextUrl.searchParams.append(key, lastItem.id.toString())
     }
 
     return {
-      data,
+      data: results,
       cursor: {
         after: lastItem?.id ?? null,
       },
-      count: data.length,
+      count: results.length,
       next: nextUrl?.toString() ?? null,
     }
   }
