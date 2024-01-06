@@ -8,6 +8,7 @@ import { AuthModule } from 'src/auth/auth.module'
 import { UsersModule } from 'src/users/users.module'
 import { CommonModule } from 'src/common/common.module'
 import { ImageModel } from 'src/common/entities/image.entity'
+import { PostsImagesService } from './image/images.service'
 
 @Module({
   imports: [
@@ -42,6 +43,6 @@ import { ImageModel } from 'src/common/entities/image.entity'
    * porviders 안에 등록된 모든 클래스들은 인스턴스화 없이
    * IoC 컨테이너가 의존하면서 사용할 수 있게 된다.
    */
-  providers: [PostsService],
+  providers: [PostsService, PostsImagesService],
 })
 export class PostsModule {}
