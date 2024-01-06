@@ -1,5 +1,5 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common'
-import { Observable, tap } from 'rxjs'
+import { Observable, map, tap } from 'rxjs'
 
 @Injectable()
 export class LogInterceptor implements NestInterceptor {
@@ -29,8 +29,12 @@ export class LogInterceptor implements NestInterceptor {
      * 라우트의 로직이 전부 실행되고 응답이 반환된다.
      * observable로
      */
-    // pipe() 안에 RxJS에서 제공해주는 함수드을 무한하게 넣을 수 있음
+    // pipe() 안에 RxJS에서 제공해주는 함수들을 무한하게 넣을 수 있음
     return next.handle().pipe(
+      /*** tap()과 map()
+       * tap() : 모니터링해주는 함수
+       * map() : 변형해주는 함수
+       */
       tap(
         // [RES] {요청 path} {응답 시간} {얼마나 걸렸는지 ms}
         observable =>
@@ -40,6 +44,14 @@ export class LogInterceptor implements NestInterceptor {
             }ms`,
           ),
       ),
+      // **** map과 tap 연습
+      // map(observable => {
+      //   return {
+      //     message: '응답이 변경됐습니다.',
+      //     response: observable,
+      //   }
+      // }),
+      // tap(observable => console.log(observable)),
     )
   }
 }
