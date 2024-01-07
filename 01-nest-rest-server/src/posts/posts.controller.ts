@@ -41,7 +41,7 @@ export class PostsController {
    * 모든 post를 다 가져온다
    */
   @Get()
-  @UseInterceptors(LogInterceptor)
+  // @UseInterceptors(LogInterceptor)
   // @UseFilters(HttpExceptionFilter)
   getPosts(@Query() query: PaginatePostDto) {
     // throw new BadRequestException('에러 테스트')

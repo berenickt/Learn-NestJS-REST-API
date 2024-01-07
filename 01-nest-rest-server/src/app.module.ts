@@ -1,4 +1,4 @@
-import { ClassSerializerInterceptor, Module } from '@nestjs/common'
+import { ClassSerializerInterceptor, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { ConfigModule } from '@nestjs/config'
@@ -21,6 +21,7 @@ import {
 } from './common/const/env-keys.const'
 import { PUBLIC_FOLDER_PATH } from './common/const/path.const'
 import { ImageModel } from './common/entities/image.entity'
+import { LogMiddleware } from './common/middleware/log.middleware'
 
 @Module({
   imports: [
@@ -62,4 +63,11 @@ import { ImageModel } from './common/entities/image.entity'
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LogMiddleware).forRoutes({
+      path: '*', // 뒤에 어떤 글자이든 적용(와일드카드)
+      method: RequestMethod.ALL, // 모든 요청에 적용
+    })
+  }
+}
