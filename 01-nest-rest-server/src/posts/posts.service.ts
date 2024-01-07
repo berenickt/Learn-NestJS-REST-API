@@ -128,8 +128,9 @@ export class PostsService {
   }
 
   // **** 6) ID별 포스트 가져오기
-  async getPostById(id: number) {
-    const post = await this.postsRepository.findOne({
+  async getPostById(id: number, qr?: QueryRunner) {
+    const repository = this.getRepository(qr)
+    const post = await repository.findOne({
       ...DEFAULT_POST_FIND_OPTIONS,
       // PostsModel의 id가 입력받은 id와 같은지 필터링
       where: {
