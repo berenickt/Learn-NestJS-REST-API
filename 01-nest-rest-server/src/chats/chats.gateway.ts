@@ -17,7 +17,7 @@ export class ChatsGateway implements OnGatewayConnection {
   server: Server
 
   handleConnection(socket: Socket) {
-    console.log(`on connect called : ${socket.id}`)
+    console.log(`On connect called : ${socket.id}`)
   }
 
   @SubscribeMessage('enter_chat')
@@ -30,12 +30,19 @@ export class ChatsGateway implements OnGatewayConnection {
     }
   }
 
-  // socket.on('send_message', (message)=>{ console.log(message)})
   @SubscribeMessage('send_message')
-  sendMessage(@MessageBody() message: { message: string; chatId: number }) {
-    // 방에 들어간 사용자에게만 메시지 보내기
-    this.server
-      .in(message.chatId.toString()) //
+  sendMessage(
+    @MessageBody() message: { message: string; chatId: number },
+    @ConnectedSocket() socket: Socket, //
+  ) {
+    // **** socket은 현재 연결된 socket을 의미 (나를 제외하고 다른사람들한테만 보내기)
+    socket
+      .to(message.chatId.toString()) //
       .emit('receive_message', message.message)
+
+    // **** 서버 전체 사용자에게만 메시지 보내기
+    // this.server
+    //   .in(message.chatId.toString()) //
+    //   .emit('receive_message', message.message)
   }
 }
