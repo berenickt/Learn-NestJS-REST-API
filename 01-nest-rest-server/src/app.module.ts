@@ -24,6 +24,7 @@ import { ImageModel } from './common/entities/image.entity'
 import { LogMiddleware } from './common/middleware/log.middleware'
 import { ChatsModule } from './chats/chats.module'
 import { ChatsModel } from './chats/entity/chats.entity'
+import { MessagesModel } from './chats/messages/entitiy/messages.entity'
 
 @Module({
   imports: [
@@ -49,7 +50,13 @@ import { ChatsModel } from './chats/entity/chats.entity'
       password: process.env[ENV_DB_PASSWORD_KEY],
       database: process.env[ENV_DB_DATABASE_KEY],
       // entities폴더에 작성한 PostsModel 가져오기
-      entities: [PostsModel, UsersModel, ImageModel, ChatsModel],
+      entities: [
+        PostsModel, //
+        UsersModel,
+        ImageModel,
+        ChatsModel,
+        MessagesModel,
+      ],
       synchronize: true,
     }),
     UsersModule,

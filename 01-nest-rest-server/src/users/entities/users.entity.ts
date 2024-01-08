@@ -9,6 +9,7 @@ import { lengthValidationMessage } from 'src/common/validation-message/length-va
 import { stringValidationMessage } from 'src/common/validation-message/string-validation.message'
 import { emailValidationMessage } from 'src/common/validation-message/email-validation.message'
 import { ChatsModel } from 'src/chats/entity/chats.entity'
+import { MessagesModel } from 'src/chats/messages/entitiy/messages.entity'
 
 @Entity()
 export class UsersModel extends BaseModel {
@@ -81,4 +82,7 @@ export class UsersModel extends BaseModel {
   @ManyToMany(() => ChatsModel, chat => chat.users)
   @JoinTable()
   chats: ChatsModel[]
+
+  @OneToMany(() => MessagesModel, message => message.author)
+  messages: MessagesModel[]
 }
