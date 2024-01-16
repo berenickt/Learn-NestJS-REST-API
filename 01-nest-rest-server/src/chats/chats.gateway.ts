@@ -35,6 +35,7 @@ export class ChatsGateway implements OnGatewayConnection {
     console.log(`On connect called : ${socket.id}`)
   }
 
+  @SubscribeMessage('create_chat')
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -48,7 +49,6 @@ export class ChatsGateway implements OnGatewayConnection {
   )
   @UseFilters(SocketCatchHttpExceptionFilter)
   @UseGuards(SocketBearerTokenGuard)
-  @SubscribeMessage('create_chat')
   async createChat(
     @MessageBody() data: CreateChatDto, //
     @ConnectedSocket() socket: Socket & { user: UsersModel },
@@ -57,6 +57,18 @@ export class ChatsGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('enter_chat')
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  )
+  @UseFilters(SocketCatchHttpExceptionFilter)
+  @UseGuards(SocketBearerTokenGuard)
   async enterChat(@MessageBody() data: EnterChatDto, @ConnectedSocket() socket: Socket) {
     for (const chatId of data.chatIds) {
       const exists = await this.chatsService.checkIfChatExists(chatId)
@@ -73,7 +85,22 @@ export class ChatsGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('send_message')
-  async sendMessage(@MessageBody() dto: CreateMessagesDto, @ConnectedSocket() socket: Socket) {
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  )
+  @UseFilters(SocketCatchHttpExceptionFilter)
+  @UseGuards(SocketBearerTokenGuard)
+  async sendMessage(
+    @MessageBody() dto: CreateMessagesDto, //
+    @ConnectedSocket() socket: Socket & { user: UsersModel },
+  ) {
     const chatExists = await this.chatsService.checkIfChatExists(dto.chatId)
 
     if (!chatExists) {
@@ -83,7 +110,7 @@ export class ChatsGateway implements OnGatewayConnection {
       })
     }
 
-    const message = await this.messageService.createMessage(dto)
+    const message = await this.messageService.createMessage(dto, socket.user.id)
     socket.to(message.chat.id.toString()).emit('receive_message', message.message)
   }
 }

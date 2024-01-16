@@ -5,7 +5,4 @@ import { MessagesModel } from '../entitiy/messages.entity'
 export class CreateMessagesDto extends PickType(MessagesModel, ['message']) {
   @IsNumber()
   chatId: number
-
-  @IsNumber()
-  authorId: number
 }
