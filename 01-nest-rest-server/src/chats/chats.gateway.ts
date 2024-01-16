@@ -13,10 +13,11 @@ import { ChatsService } from './chats.service'
 import { EnterChatDto } from './dto/enter-chat.dto'
 import { CreateMessagesDto } from './messages/dto/create-messages.dto'
 import { ChatsMessagesService } from './messages/messages.service'
-import { UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
+import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common'
 import { SocketCatchHttpExceptionFilter } from 'src/common/exception-filter/socket-exception.filter'
-import { SocketBearerTokenGuard } from 'src/auth/guard/socket/socket-bearer-token.guard'
 import { UsersModel } from 'src/users/entities/users.entity'
+import { AuthService } from 'src/auth/auth.service'
+import { UsersService } from 'src/users/users.service'
 
 @WebSocketGateway({
   // ws://localhost:3000/chats
@@ -26,13 +27,27 @@ export class ChatsGateway implements OnGatewayConnection {
   constructor(
     private readonly chatsService: ChatsService,
     private readonly messageService: ChatsMessagesService,
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
   ) {}
 
   @WebSocketServer()
   server: Server
 
-  handleConnection(socket: Socket) {
-    console.log(`On connect called : ${socket.id}`)
+  async handleConnection(socket: Socket & { user: UsersModel }) {
+    console.log(`On connect called... ${socket.id}`)
+    const rawToken = socket.handshake.headers['authorization']
+    if (!rawToken) socket.disconnect()
+
+    try {
+      const token = this.authService.extractTokenFromHeader(rawToken, true)
+      const payload = this.authService.verifyToken(token)
+      socket.user = await this.usersService.getUserByEmail(payload.email)
+
+      return true
+    } catch (e) {
+      socket.disconnect()
+    }
   }
 
   @SubscribeMessage('create_chat')
@@ -48,7 +63,6 @@ export class ChatsGateway implements OnGatewayConnection {
     }),
   )
   @UseFilters(SocketCatchHttpExceptionFilter)
-  @UseGuards(SocketBearerTokenGuard)
   async createChat(
     @MessageBody() data: CreateChatDto, //
     @ConnectedSocket() socket: Socket & { user: UsersModel },
@@ -68,8 +82,10 @@ export class ChatsGateway implements OnGatewayConnection {
     }),
   )
   @UseFilters(SocketCatchHttpExceptionFilter)
-  @UseGuards(SocketBearerTokenGuard)
-  async enterChat(@MessageBody() data: EnterChatDto, @ConnectedSocket() socket: Socket) {
+  async enterChat(
+    @MessageBody() data: EnterChatDto, //
+    @ConnectedSocket() socket: Socket & { user: UsersModel },
+  ) {
     for (const chatId of data.chatIds) {
       const exists = await this.chatsService.checkIfChatExists(chatId)
 
@@ -96,7 +112,6 @@ export class ChatsGateway implements OnGatewayConnection {
     }),
   )
   @UseFilters(SocketCatchHttpExceptionFilter)
-  @UseGuards(SocketBearerTokenGuard)
   async sendMessage(
     @MessageBody() dto: CreateMessagesDto, //
     @ConnectedSocket() socket: Socket & { user: UsersModel },
