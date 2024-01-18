@@ -1,6 +1,7 @@
 import {
   Controller,
   DefaultValuePipe,
+  Delete,
   Get,
   Param,
   ParseBoolPipe,
@@ -58,6 +59,16 @@ export class UsersController {
     @Param('id', ParseIntPipe) followerId: number,
   ) {
     await this.usersService.confirmFollow(followerId, followeeId)
+    return true
+  }
+
+  // **** 팔로우 요청 삭제
+  @Delete('follow/:id')
+  async deleteFollow(
+    @User() user: UsersModel, //
+    @Param('id', ParseIntPipe) followeeId: number,
+  ) {
+    await this.usersService.deleteFollow(user.id, followeeId)
     return true
   }
 
