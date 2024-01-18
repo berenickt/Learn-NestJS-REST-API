@@ -92,12 +92,11 @@ export class UsersModel extends BaseModel {
   postComments: CommentsModel[]
 
   // 내가 팔로우 하고 있는 사람들
-  @ManyToMany(() => UsersModel, user => user.followees)
-  @JoinTable()
+  @OneToMany(() => UserFollowersModel, ufm => ufm.follower)
   followers: UsersModel[]
 
   // 나를 팔로우 하고 있는 사람들
-  @ManyToMany(() => UsersModel, user => user.followers)
+  @OneToMany(() => UserFollowersModel, ufm => ufm.followee)
   followees: UsersModel[]
 
   @Column({ default: 0 })

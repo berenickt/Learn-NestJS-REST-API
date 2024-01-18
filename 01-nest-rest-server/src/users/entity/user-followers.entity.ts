@@ -10,8 +10,6 @@ export class UserFollowersModel extends BaseModel {
   @ManyToOne(() => UsersModel, user => user.followees)
   followee: UsersModel
 
-  @Column({
-    default: false,
-  })
+  @Column({ default: false })
   isConfirmed: boolean
 }
