@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config'
 
 import { FindManyOptions, FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm'
 import { BasePaginationDto } from './dto/base-pagination.dto'
-import { BaseModel } from './entities/base.entity'
+import { BaseModel } from './entity/base.entity'
 import { FILTER_MAPPER } from './const/filter-mapper.const'
 import { ENV_HOST_KEY, ENV_PROTOCOL_KEY } from './const/env-keys.const'
 

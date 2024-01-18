@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { UsersService } from './users.service'
 import { UsersController } from './users.controller'
-import { UsersModel } from './entities/users.entity'
+import { UsersModel } from './entity/users.entity'
 
 @Module({
   // 이 모듈 안에서 UsersModel을 어디서든 사용 가능

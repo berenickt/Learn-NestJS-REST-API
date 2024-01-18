@@ -3,13 +3,15 @@ import { Exclude } from 'class-transformer'
 
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm'
 import { RolesEnum } from '../const/roles.const'
-import { PostsModel } from 'src/posts/entities/posts.entity'
-import { BaseModel } from 'src/common/entities/base.entity'
+import { PostsModel } from 'src/posts/entity/posts.entity'
+import { BaseModel } from 'src/common/entity/base.entity'
 import { lengthValidationMessage } from 'src/common/validation-message/length-validation.message'
 import { stringValidationMessage } from 'src/common/validation-message/string-validation.message'
 import { emailValidationMessage } from 'src/common/validation-message/email-validation.message'
 import { ChatsModel } from 'src/chats/entity/chats.entity'
 import { MessagesModel } from 'src/chats/messages/entitiy/messages.entity'
+import { CommentsModel } from 'src/posts/comments/entity/comments.entity'
+import { UserFollowersModel } from './user-followers.entity'
 
 @Entity()
 export class UsersModel extends BaseModel {
@@ -85,4 +87,22 @@ export class UsersModel extends BaseModel {
 
   @OneToMany(() => MessagesModel, message => message.author)
   messages: MessagesModel[]
+
+  @OneToMany(() => CommentsModel, comment => comment.author)
+  postComments: CommentsModel[]
+
+  // 내가 팔로우 하고 있는 사람들
+  @ManyToMany(() => UsersModel, user => user.followees)
+  @JoinTable()
+  followers: UsersModel[]
+
+  // 나를 팔로우 하고 있는 사람들
+  @ManyToMany(() => UsersModel, user => user.followers)
+  followees: UsersModel[]
+
+  @Column({ default: 0 })
+  followerCount: number
+
+  @Column({ default: 0 })
+  followeeCount: number
 }

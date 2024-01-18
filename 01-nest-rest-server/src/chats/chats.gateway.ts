@@ -17,7 +17,7 @@ import { CreateMessagesDto } from './messages/dto/create-messages.dto'
 import { ChatsMessagesService } from './messages/messages.service'
 import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common'
 import { SocketCatchHttpExceptionFilter } from 'src/common/exception-filter/socket-exception.filter'
-import { UsersModel } from 'src/users/entities/users.entity'
+import { UsersModel } from 'src/users/entity/users.entity'
 import { AuthService } from 'src/auth/auth.service'
 import { UsersService } from 'src/users/users.service'
 

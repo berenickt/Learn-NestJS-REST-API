@@ -1,14 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { FindOptionsWhere, LessThan, MoreThan, QueryRunner, Repository } from 'typeorm'
-import { PostsModel } from './entities/posts.entity'
+import { PostsModel } from './entity/posts.entity'
 import { CreatePostDto } from './dto/create-post.dto'
 import { UpdatePostDto } from './dto/update-post.dto'
 import { PaginatePostDto } from './dto/paginate-post.dto'
 import { CommonService } from 'src/common/common.service'
 import { ConfigService } from '@nestjs/config'
 import { ENV_HOST_KEY, ENV_PROTOCOL_KEY } from 'src/common/const/env-keys.const'
-import { ImageModel } from 'src/common/entities/image.entity'
+import { ImageModel } from 'src/common/entity/image.entity'
 import { DEFAULT_POST_FIND_OPTIONS } from './const/default-post-find-options.const'
 
 @Injectable()
@@ -51,7 +51,7 @@ export class PostsService {
   // **** 4) 페이지 기반 페이지네이션
   async pagePaginatePosts(dto: PaginatePostDto) {
     const [posts, count] = await this.postsRepository.findAndCount({
-      skip: dto.take * dto.page,
+      skip: dto.take * (dto.page - 1),
       take: dto.take,
       order: {
         createdAt: dto.order__createdAt,
@@ -200,5 +200,44 @@ export class PostsService {
     await this.postsRepository.delete(postId)
 
     return postId
+  }
+
+  async incrementCommentCount(postId: number, qr?: QueryRunner) {
+    const repository = this.getRepository(qr)
+
+    await repository.increment(
+      {
+        id: postId,
+      },
+      'commentCount',
+      1,
+    )
+  }
+
+  async decrementCommentCount(postId: number, qr?: QueryRunner) {
+    const repository = this.getRepository(qr)
+    await repository.decrement(
+      { id: postId }, //
+      'commentCount',
+      1,
+    )
+  }
+
+  // **** 이 id를 가진 post가 존재하는지 확인
+  async checkPostExistsById(id: number) {
+    return this.postsRepository.exist({
+      where: { id },
+    })
+  }
+
+  // **** 내 포스트인지 아닌지 확인
+  async isPostMine(userId: number, postId: number) {
+    return this.postsRepository.exist({
+      where: {
+        id: postId,
+        author: { id: userId },
+      },
+      relations: { author: true },
+    })
   }
 }

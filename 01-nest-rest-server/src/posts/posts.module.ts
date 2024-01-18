@@ -3,11 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { PostsService } from './posts.service'
 import { PostsController } from './posts.controller'
-import { PostsModel } from './entities/posts.entity'
+import { PostsModel } from './entity/posts.entity'
 import { AuthModule } from 'src/auth/auth.module'
 import { UsersModule } from 'src/users/users.module'
 import { CommonModule } from 'src/common/common.module'
-import { ImageModel } from 'src/common/entities/image.entity'
+import { ImageModel } from 'src/common/entity/image.entity'
 import { PostsImagesService } from './image/images.service'
 import { LogMiddleware } from 'src/common/middleware/log.middleware'
 
