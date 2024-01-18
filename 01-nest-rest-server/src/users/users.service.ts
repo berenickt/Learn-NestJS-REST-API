@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { UsersModel } from './entity/users.entity'
-import { Repository } from 'typeorm'
+import { Repository, Tree } from 'typeorm'
 
 @Injectable()
 export class UsersService {
@@ -44,5 +44,40 @@ export class UsersService {
     return this.userRepository.findOne({
       where: { email },
     })
+  }
+
+  // **** 4) 팔로우 요청
+  async followUser(followerId: number, followeeId: number) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: followerId,
+      },
+      relations: {
+        followees: true,
+      },
+    })
+
+    if (!user) {
+      throw new BadRequestException('존재하지 않는 팔로워입니다.')
+    }
+
+    await this.userRepository.save({
+      ...user,
+      followees: [...user.followees, { id: followeeId }],
+    })
+
+    return true
+  }
+
+  // **** 5) 팔로워들 조회
+  async getFollowers(userId: number): Promise<UsersModel[]> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: {
+        followers: true,
+      },
+    })
+
+    return user.followers
   }
 }
