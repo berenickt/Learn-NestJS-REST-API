@@ -202,27 +202,6 @@ export class PostsService {
     return postId
   }
 
-  async incrementCommentCount(postId: number, qr?: QueryRunner) {
-    const repository = this.getRepository(qr)
-
-    await repository.increment(
-      {
-        id: postId,
-      },
-      'commentCount',
-      1,
-    )
-  }
-
-  async decrementCommentCount(postId: number, qr?: QueryRunner) {
-    const repository = this.getRepository(qr)
-    await repository.decrement(
-      { id: postId }, //
-      'commentCount',
-      1,
-    )
-  }
-
   // **** 이 id를 가진 post가 존재하는지 확인
   async checkPostExistsById(id: number) {
     return this.postsRepository.exist({
@@ -239,5 +218,26 @@ export class PostsService {
       },
       relations: { author: true },
     })
+  }
+
+  // **** 포스트 댓글 수 증가
+  async incrementCommentCount(postId: number, qr?: QueryRunner) {
+    const repository = this.getRepository(qr)
+
+    await repository.increment(
+      { id: postId }, //
+      'commentCount',
+      1,
+    )
+  }
+
+  // **** 포스트 댓글 수 감소
+  async decrementCommentCount(postId: number, qr?: QueryRunner) {
+    const repository = this.getRepository(qr)
+    await repository.decrement(
+      { id: postId }, //
+      'commentCount',
+      1,
+    )
   }
 }
