@@ -224,20 +224,12 @@ export class PostsService {
   async incrementCommentCount(postId: number, qr?: QueryRunner) {
     const repository = this.getRepository(qr)
 
-    await repository.increment(
-      { id: postId }, //
-      'commentCount',
-      1,
-    )
+    await repository.increment({ id: postId }, 'commentCount', 1)
   }
 
   // **** 포스트 댓글 수 감소
   async decrementCommentCount(postId: number, qr?: QueryRunner) {
     const repository = this.getRepository(qr)
-    await repository.decrement(
-      { id: postId }, //
-      'commentCount',
-      1,
-    )
+    await repository.decrement({ id: postId }, 'commentCount', 1)
   }
 }

@@ -19,7 +19,9 @@ export class CommentsService {
   ) {}
 
   getRepository(qr?: QueryRunner) {
-    return qr ? qr.manager.getRepository<CommentsModel>(CommentsModel) : this.commentsRepository
+    return qr //
+      ? qr.manager.getRepository<CommentsModel>(CommentsModel)
+      : this.commentsRepository
   }
 
   // **** (1) 댓글 페이지네이션
@@ -47,7 +49,12 @@ export class CommentsService {
   }
 
   // **** (3) 댓글 생성
-  async createComment(dto: CreateCommentsDto, postId: number, author: UsersModel, qr?: QueryRunner) {
+  async createComment(
+    dto: CreateCommentsDto, //
+    postId: number,
+    author: UsersModel,
+    qr?: QueryRunner,
+  ) {
     const repository = this.getRepository(qr)
 
     return repository.save({
