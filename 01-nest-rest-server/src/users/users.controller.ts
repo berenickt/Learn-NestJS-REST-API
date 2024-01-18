@@ -1,4 +1,14 @@
-import { Controller, DefaultValuePipe, Get, Param, ParseBoolPipe, ParseIntPipe, Post, Query } from '@nestjs/common'
+import {
+  Controller,
+  DefaultValuePipe,
+  Get,
+  Param,
+  ParseBoolPipe,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common'
 import { UsersService } from './users.service'
 import { Roles } from './decorator/roles.decorator'
 import { RolesEnum } from './const/roles.const'
@@ -26,8 +36,9 @@ export class UsersController {
   @Get('follow/me')
   async getFollow(
     @User() user: UsersModel, //
+    @Query('includeNotConfirmed', new DefaultValuePipe(false), ParseBoolPipe) includeNotConfirmed: boolean,
   ) {
-    return this.usersService.getFollowers(user.id)
+    return this.usersService.getFollowers(user.id, includeNotConfirmed)
   }
 
   // **** 팔로우 요청
@@ -37,6 +48,16 @@ export class UsersController {
     @Param('id', ParseIntPipe) followeeId: number,
   ) {
     await this.usersService.followUser(user.id, followeeId)
+    return true
+  }
+
+  // **** 팔로우 요청 승인
+  @Patch('follow/:id/confirm')
+  async patchFollowConfirm(
+    @User('id') followeeId: number, //
+    @Param('id', ParseIntPipe) followerId: number,
+  ) {
+    await this.usersService.confirmFollow(followerId, followeeId)
     return true
   }
 
